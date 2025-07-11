@@ -3,7 +3,6 @@ from .forms import SalesRepRegForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def registerSalesRep(request):
@@ -45,10 +44,6 @@ def userLogin(request):
         form = AuthenticationForm()
     return render(request, 'accounts/userLogin.html', {'form': form})
 
-@login_required
-def AdminDashboard(request):
-    return render(request, 'accounts/systmAdmin/dashboard.html')
-
-@login_required
-def SalesRepDashboard(request):
-    return render(request, 'accounts/salesRep/dashboard.html')
+def userLogout(request):
+    logout(request)
+    return redirect('userLogin')
