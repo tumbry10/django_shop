@@ -7,12 +7,12 @@ class CustomUser(AbstractUser):
         (1, "SystAdmin"),
         (2, "SalesReps")
     )
-    user_type = models.PositiveSmallIntegerField(default=1, choices=user_type_choices, max_length=20)
+    user_type = models.PositiveSmallIntegerField(default=1, choices=user_type_choices)
 
     class Meta:
         db_table = "custom_user"
 
-        
+
     def __str__(self):
         return self.username
 
