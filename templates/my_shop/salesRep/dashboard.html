@@ -1,3 +1,17 @@
 Hello, Sales Rep
+<br> <br>
+<div>
+    {% if messages %}
+        <div>
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<a href="{% url 'receive_stock' %}">Receive Stock</a> | <a href="{% url 'make_sale' %}">Make a Sale</a> <br>
 
 <a href="{% url 'userLogout' %}">Logout</a>
+
+

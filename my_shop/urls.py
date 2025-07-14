@@ -16,4 +16,12 @@ urlpatterns = [
     path('products/list/', views.listProduct, name='list_product'),
     path('products/edit/<int:pk>/', views.editProduct, name='edit_product'),
     path('products/delete/<int:pk>/', views.deleteProduct, name='delete_product'),
+
+    #STOCK URLS
+    path('stock/receiveStock/', views.receiveStock, name='receive_stock'),
+    path('stock/receipt/<int:pk>/', views.stockInReceipt, name='stock_in_receipt'),
+
+    #SALES URLS
+    path('sale/makeSale/', views.makeSale, name='make_sale'),
+    path('sale/invoice/<int:pk>/', views.saleInvoice, name='sale_invoice'),
 ]

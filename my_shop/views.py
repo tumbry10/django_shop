@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from accounts.decorators import system_admin_required, sales_rep_required
 from django.contrib import messages
-from . models import Brand, Product
-from . forms import BrandCreationForm, ProductCreationForm
+from . models import Brand, Product, StockIn, StockInItem, Sale, SaleItem
+from . forms import BrandCreationForm, ProductCreationForm, StockInItemFormSet, SaleItemFormSet
 
 # Create your views here.
 @login_required
@@ -138,3 +138,111 @@ def deleteProduct(request, pk):
     product.delete()
     messages.success(request, 'Product Deleted Successfully')
     return redirect('list_product')
+
+@login_required
+@sales_rep_required
+def receiveStock(request):
+    formset = StockInItemFormSet()
+    if request.method == 'POST':
+        formset = StockInItemFormSet(request.POST, request.FILES)
+
+        if formset.is_valid():
+            #Create one stockIn record
+            stockIn = StockIn.objects.create(received_by = request.user)
+
+            for form in formset:
+                if form.cleaned_data:
+                    product = form.cleaned_data['product']
+                    quantity_received = form.cleaned_data['quantity_received']
+
+                    #create stockInItem record
+                    StockInItem.objects.create(
+                        stock_in=stockIn, 
+                        product=product, 
+                        quantity_received=quantity_received
+                    )
+
+                    #Update product quantity
+                    product.quantity_in_stock += quantity_received
+                    product.save()
+        messages.success(request, 'Stock Received Successfully')
+        return redirect('salesRepDashboard')
+    else:
+        formset = StockInItemFormSet()
+    context = {
+        'formset': formset,
+    }
+    return render(request, 'my_shop/salesRep/receiveStock.html', context)
+
+@login_required
+def stockInReceipt(request, pk):
+    stockIn = get_object_or_404(StockIn, pk=pk)
+    print(stockIn)
+    items = StockInItem.objects.filter(stock_in=stockIn) #filtering items of the specific stockIn
+
+    total_quantity = sum(item.quantity_received for item in items)
+
+    context = {
+        'stockIn': stockIn,
+        'items': items,
+        'total_quantity': total_quantity,
+    }
+    return render(request, 'my_shop/stockInReceipt.html', context)
+
+@login_required
+@sales_rep_required
+def makeSale(request):
+    if request.method == 'POST':
+        formset = SaleItemFormSet(request.POST)
+        if formset.is_valid():
+            sale = Sale.objects.create(sold_by=request.user)
+            total_amount = 0
+            for form in formset:
+                if form.cleaned_data:
+                    product = form.cleaned_data['product']
+                    quantity_sold = form.cleaned_data['quantity_sold']
+
+                    if product.quantity_in_stock < quantity_sold:
+                        messages.error(request, f"Not enough stock for {product.name}. Available: {product.quantity_in_stock}")
+                        sale.delete() #rollback sale
+                        return redirect('makeSale')
+                    
+                    price_at_sale = product.price
+                    line_total = price_at_sale * quantity_sold
+                    total_amount += line_total
+
+                    #create sale item
+                    SaleItem.objects.create(
+                        sale =sale,
+                        product = product,
+                        quantity_sold = quantity_sold,
+                        price_at_sale = price_at_sale
+                    )
+                    #Update stock details
+                    product.quantity_in_stock -= quantity_sold
+                    product.save()
+            sale.total_amount = total_amount
+            sale.save()
+
+            messages.success(request, 'Sale Completed Successfully')
+            return redirect('salesRepDashboard')
+        else:
+            # This runs when form.is_valid() is False            
+            messages.error(request, 'Invalid Form Data')
+    else:
+        formset = SaleItemFormSet()
+    context = {
+        'formset': formset,
+    }
+    return render(request, 'my_shop/salesRep/makeSale.html', context)
+
+@login_required
+def saleInvoice(request, pk):
+    sale = get_object_or_404(Sale, pk=pk)
+    items = sale.items.all() #get all sale items for this sale, thanks to related_name='items'
+
+    context = {
+        'sale': sale,
+        'items': items,
+    }
+    return render(request, 'my_shop/saleInvoice.html', context)

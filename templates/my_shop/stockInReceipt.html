@@ -1,0 +1,27 @@
+<h2>Stock-In Receipt</h2>
+
+<p><strong>Received By:</strong> {{ stockIn.received_by|default:"N/A" }}</p>
+<p><strong>Date:</strong> {{ stockIn.date_received|date:"Y-m-d" }}</p>
+
+<h3>Items Received</h3>
+<table border="1" cellpadding="5" cellspacing="0">
+    <thead>
+        <th>Product</th>
+        <th>Quantity</th>
+    </thead>
+    {% for item in items %}
+    <tr>
+        <td>{{ item.product.name }}</td>
+        <td>{{ item.quantity_received }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<p><strong>Total Quantity Received:</strong> {{ total_quantity }}</p>
+
+<br>
+
+<button onclick="window.print()">Print Receipt</button>
+
+<br><br>
+<a href="{% url 'receive_stock' %}">Back to Receive Stock</a>

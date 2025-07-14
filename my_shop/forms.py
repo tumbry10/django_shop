@@ -1,5 +1,6 @@
 from django import forms
-from . models import Brand, Product
+from . models import Brand, Product, StockInItem, Sale, SaleItem
+from django.forms import formset_factory
 
 
 class BrandCreationForm(forms.ModelForm):
@@ -11,3 +12,15 @@ class ProductCreationForm(forms.ModelForm):
     class Meta:
         model = Product
         fields =  ['name', 'brand', 'description', 'size', 'price', 'quantity_in_stock']
+
+class StockInItemForm(forms.Form):
+    product = forms.ModelChoiceField(queryset=Product.objects.all(), label='Product')
+    quantity_received = forms.IntegerField(min_value=1, label='Quantity Received')
+
+StockInItemFormSet = formset_factory(StockInItemForm, extra=5)  # 5 rows by default
+
+class SaleItemForm(forms.Form):
+    product = forms.ModelChoiceField(queryset=Product.objects.all(), label='Product')
+    quantity_sold = forms.IntegerField(min_value=1, label='Quantity Sold')
+
+SaleItemFormSet = formset_factory(SaleItemForm, extra=5)  # 5 rows by default
