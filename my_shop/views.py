@@ -4,6 +4,8 @@ from accounts.decorators import system_admin_required, sales_rep_required
 from django.contrib import messages
 from . models import Brand, Product, StockIn, StockInItem, Sale, SaleItem
 from . forms import BrandCreationForm, ProductCreationForm, StockInItemFormSet, SaleItemFormSet
+from accounts.models import CustomUser
+from django.db.models import F
 
 # Create your views here.
 @login_required
@@ -12,16 +14,49 @@ def AdminDashboard(request):
     brands =  Brand.objects.all()
     products = Product.objects.all()
 
+    total_brands = Brand.objects.count()
+    total_products = Product.objects.count()
+    total_stock_in = StockIn.objects.count()
+    total_sales =  Sale.objects.count()
+    total_sales_reps = CustomUser.objects.filter(user_type=2).count()
+    total_admins = CustomUser.objects.filter(user_type = 1).count()
+    total_users = CustomUser.objects.count()
+
+    low_stock_products = Product.objects.filter(quantity_in_stock__lte=F('low_stock_threshold')).order_by('quantity_in_stock')
+
+
     context = {
         'brands': brands,
-        'products': products
+        'products': products,
+        'total_brands': total_brands,
+        'total_products': total_products,
+        'total_stock_in': total_stock_in,
+        'total_sales': total_sales,
+        'total_sales_reps': total_sales_reps,
+        'total_admins': total_admins,
+        'total_users': total_users,
+        'low_stock_products': low_stock_products
     }
     return render(request, 'my_shop/systmAdmin/dashboard.html', context)
 
 @login_required
 @sales_rep_required
 def SalesRepDashboard(request):
-    return render(request, 'my_shop/salesRep/dashboard.html')
+    total_my_sales = Sale.objects.filter(sold_by = request.user).count()
+    total_my_stock_in = StockIn.objects.filter(received_by = request.user).count()
+    total_products_available = Product.objects.count()
+    latest_sales = Sale.objects.filter(sold_by = request.user).order_by('-date_sold')[:5] #Show last 5 sales made by the sales rep
+    low_stock_products = Product.objects.filter(quantity_in_stock__lte=F('low_stock_threshold')).order_by('quantity_in_stock')
+
+
+    context = {
+        'total_my_sales': total_my_sales,
+        'total_my_stock_in': total_my_stock_in,
+        'total_products_available' : total_products_available,
+        'latest_sales' : latest_sales,
+        'low_stock_products' : low_stock_products
+    }
+    return render(request, 'my_shop/salesRep/dashboard.html', context)
 
 @login_required
 @system_admin_required

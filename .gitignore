@@ -1,0 +1,57 @@
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+env/
+.venv/
+.env/
+*.sqlite3
+db.sqlite3
+
+# Django static & media
+/static/
+/media/
+
+# VSCode
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Environment
+*.env
+
+# Logs
+*.log
+
+# Migrations (optional, depending on workflow)
+*/migrations/__pycache__/
+*/migrations/*.pyc
+
+# Python virtual environment (if named .env)
+django_shop/.env/
+
+# Python dependency files
+Pipfile
+Pipfile.lock
+
+# Coverage reports
+htmlcov/
+.coverage
+
+# JetBrains IDEs
+.idea/
+
+# Compiled static files
+staticfiles/
+
+# Temporary files
+*.tmp
+*.swp
+
+# Requirements (if auto-generated, keep manually maintained one though)
+requirements.txt.bak

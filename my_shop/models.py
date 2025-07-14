@@ -22,6 +22,9 @@ class Product(models.Model):
     size = models.CharField(max_length=10, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity_in_stock = models.PositiveIntegerField(default=0)
+    low_stock_threshold = models.PositiveIntegerField(default=5)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     class Meta:
         db_table = 'product'

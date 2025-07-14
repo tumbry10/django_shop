@@ -11,4 +11,29 @@ Hello, Systm Admin
 </div>
 
 <a href="{% url 'create_brand' %}">Create Brand</a> | <a href="{% url 'create_product' %}">Create Product</a> <br>
+
+<div>
+    <h3>SYSTEM SUMMARY</h3>
+    <ul>
+        <li>Total Products: {{ total_products }}</li>
+        <li>Total Brands: {{ total_brands }}</li>
+        <li>Total Stock Ins: {{ total_stock_in }}</li>
+        <li>Total Sales: {{ total_sales }}</li>
+        <li>Total Users: {{ total_users }}</li>
+        <li>Total Sales Reps: {{ total_sales_reps }}</li>
+        <li>Total Admins: {{ total_admins }}</li>
+    </ul>
+</div>
+<br>
+<h3>⚠️ Low Stock Products</h3>
+{% if low_stock_products %}
+  <ul>
+    {% for product in low_stock_products %}
+      <li>{{ product.name }} — Only {{ product.quantity_in_stock }} left</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No low stock products 🎉</p>
+{% endif %}
+
 <a href="{% url 'userLogout' %}">Logout</a>

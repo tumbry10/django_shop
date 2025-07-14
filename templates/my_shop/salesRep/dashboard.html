@@ -1,4 +1,4 @@
-Hello, Sales Rep
+<h2>Sales Representative Dashboard</h2>
 <br> <br>
 <div>
     {% if messages %}
@@ -11,6 +11,45 @@ Hello, Sales Rep
 </div>
 
 <a href="{% url 'receive_stock' %}">Receive Stock</a> | <a href="{% url 'make_sale' %}">Make a Sale</a> <br>
+
+<ul>
+  <li>Your Total Sales: {{ total_my_sales }}</li>
+  <li>Your Total Stock Ins: {{ total_my_stock_in }}</li>
+  <li>Product Types Available: {{ total_products_available }}</li>
+</ul>
+
+<h3>Your Latest 5 Sales</h3>
+<table border="1" cellpadding="5" cellspacing="0">
+    <thead>
+        <th>#</th>
+        <th>Date Sold</th>
+        <th>Total Amount</th>
+    </thead>
+    {% for sale in latest_sales %}
+    <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ sale.date_sold|date:"Y-m-d H:i" }}</td>
+        <td>${{ sale.total_amount }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="3">No sales yet.</td>
+    </tr>
+    {% endfor %}
+</table>
+<br><br>
+<h3>⚠️ Low Stock Products</h3>
+{% if low_stock_products %}
+  <ul>
+    {% for product in low_stock_products %}
+      <li>{{ product.name }} — Only {{ product.quantity_in_stock }} left</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No low stock products 🎉</p>
+{% endif %}
+
+
 
 <a href="{% url 'userLogout' %}">Logout</a>
 
