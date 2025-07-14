@@ -1,0 +1,39 @@
+<h3>Here is a list of  All Products Available</h3>
+
+<div>
+    {% if messages %}
+        <div>
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<table>
+    <thead>
+        <th>#</th>
+        <th>Product Name</th>
+        <th>Brand</th>
+        <th>Price</th>
+        <th>Size</th>
+        <th>Quantity</th>
+        <th>Action</th>
+    </thead>
+    <tbody>
+        {% for product in products %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ product.name }}</td>
+                <td>{{ product.brand }}</td>
+                <td>{{ product.price }}</td>
+                <td>{{ product.size }}</td>
+                <td>{{ product.quantity_in_stock }}</td>
+                <td>
+                    <a href="{% url 'edit_product' product.pk %}">Edit</a>
+                    <a href="{% url 'delete_product' product.pk %}">Delete</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
