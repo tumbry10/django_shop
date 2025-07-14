@@ -1,0 +1,17 @@
+Mhamha's Cosmetic Shop Inventory System
+
+A Django-based inventory and stock management system designed for a backyard cosmetic shop.  
+Features include:
+- User management with custom user roles (SystemAdmin and SalesRep)
+- Stock receiving functionality
+- Sales management and invoicing
+- Role-specific dashboards
+- Low stock alert system
+
+Planned future upgrades:
+- Bootstrap 5 UI
+- Vanilla JS interactivity
+- PDF and CSV report generation
+- Live deployment
+
+Built with ❤️ by Tumbry10, 2025.
