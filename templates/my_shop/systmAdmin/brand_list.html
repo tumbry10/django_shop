@@ -1,0 +1,35 @@
+<h3>Here Are All Brands Available</h3>
+
+<div>
+    {% if messages %}
+        <div>
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<table>
+    <thead>
+        <th>#</th>
+        <th>Brand Name</th>
+        <th>Description</th>
+        <th>Logo</th>
+        <th>Action</th>
+    </thead>
+    <tbody>
+        {% for brand in brands %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ brand.name }}</td>
+                <td>{{ brand.description }}</td>
+                <td>{{ brand.logo }}</td>
+                <td>
+                    <a href="{% url 'edit_brand' brand.pk %}">Edit</a>
+                    <a href="{% url 'delete_brand' brand.pk %}">Delete</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
