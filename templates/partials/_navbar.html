@@ -1,0 +1,58 @@
+{% load static %}
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <span class="text-info">
+                <i class="bi bi-gem"></i>
+            </span>
+            <span>
+                 B_Shop
+            </span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav m-auto mb-2 mb-lg-0"> <!-- m-auto for centering ul links -->
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Brands</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Stock</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Sales</a>
+                </li>
+            </ul>
+            <!-- User Profile Start -->
+            <ul class="navbar-nav mb-2 mb-lg-0">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle" style="font-size: 26px;"></i>
+                        <span class="text-info ms-2">{{ user.username }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="#">Profile</a></li>
+                        <li><a class="dropdown-item" href="#">Change Password</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form action="{% url 'userLogout' %}" method="post">
+                                {% csrf_token %}
+                                <input type="submit" class="dropdown-item" value="Logout">
+                            </form>
+                            <!--a class="dropdown-item" href="#">Logout</a-->
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <!-- User Profile Ends -->
+        </div>
+    </div>
+</nav>

@@ -1,4 +1,84 @@
-<h2>Sales Representative Dashboard</h2>
+{% extends 'partials/base.html' %}
+
+{% block title %}SaleRep Dashboard{% endblock %}
+
+{% block content %}
+  <h1 class="mb-4">Sales Rep Dashboard </h1>
+  <h3>Welcomes : {{ request.user }}</h3>
+  <div class="row">
+    <div class="col-md-3">
+      <div class="card text-white bg-success mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Total Sales</h5>
+          <p class="card-text">{{ total_my_sales }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card text-white bg-success mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Products</h5>
+          <p class="card-text">{{ total_products_available }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card text-white bg-success mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Stock Received</h5>
+          <p class="card-text">{{ total_my_stock_in }}</p>
+        </div>
+      </div>
+    </div>
+        <!-- Repeat for brands, users, stock-ins, etc. -->
+    </div>
+
+    <h3 class="mt-5">⚠️ Low Stock Products</h3>
+    {% if low_stock_products %}
+      <ul class="list-group">
+        {% for product in low_stock_products %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ product.name }}
+            <span class="badge bg-danger rounded-pill">{{ product.quantity_in_stock }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No low stock products 🎉</p>
+    {% endif %}
+
+    <div>
+      <h3>Your latest sales </h3>
+      <hr>
+      <table class="table">
+        <thead>
+          <th>#</th>
+          <th>Date</th>
+          <th>Total Amount</th>
+          <th>View Invoice</th>
+        </thead>
+        <tbody>
+            {% for sale in latest_sales %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ sale.date_sold|date:"Y-m-d H:i" }}</td>
+                <td>${{ sale.total_amount }}</td>
+                <td>
+                  <a href="{% url 'sale_invoice' sale.pk %}"><i class="bi bi-file-earmark-text"></i></a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="4">No sales yet.</td>
+              </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+<!--h2>Sales Representative Dashboard</h2>
 <br> <br>
 <div>
     {% if messages %}
@@ -51,6 +131,7 @@
 
 
 
-<a href="{% url 'userLogout' %}">Logout</a>
+<a href="{% url 'userLogout' %}">Logout</a-->
 
 
+{% endblock %}
