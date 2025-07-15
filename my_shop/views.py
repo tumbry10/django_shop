@@ -211,14 +211,14 @@ def receiveStock(request):
 
 @login_required
 def stockInReceipt(request, pk):
-    stockIn = get_object_or_404(StockIn, pk=pk)
-    print(stockIn)
-    items = StockInItem.objects.filter(stock_in=stockIn) #filtering items of the specific stockIn
+    stock_in = get_object_or_404(StockIn, pk=pk)
+    print(stock_in)
+    items = StockInItem.objects.filter(stock_in=stock_in) #filtering items of the specific stockIn
 
     total_quantity = sum(item.quantity_received for item in items)
 
     context = {
-        'stockIn': stockIn,
+        'stock_in': stock_in,
         'items': items,
         'total_quantity': total_quantity,
     }

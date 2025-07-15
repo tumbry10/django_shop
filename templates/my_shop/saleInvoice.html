@@ -1,4 +1,93 @@
+{% extends 'partials/base.html' %}
+
+{% block title %}Sale Invoice #{{ sale.id }}{% endblock %}
+
+{% block content %}
 {% load shop_extras %}
+    <div id="invoiceArea">
+        <!-- Shop Header -->
+        <div class="text-center mb-4">
+            <h1 class="text-info"><i class="bi bi-gem"></i> B_Shop Cosmetics</h1>
+            <p class="mb-0">123 Beauty Street, Harare, Zimbabwe</p>
+            <p>Tel: +263 77 123 4567 | Email: info@bshop.co.zw</p>
+            <hr>
+        </div>
+        <!-- Invoice Details -->
+        <div class="d-flex justify-content-between mb-4">
+            <div>
+                <h5>Sale Invoice #: <span class="text-info">{{ sale.id }}</span></h5>
+                <p><strong>Sold By:</strong> {{ sale.sold_by.username|default:"N/A" }}</p>
+                <p><strong>Customer: </strong>{{ sale.customer|default:"Cash Sale" }}</p>
+            </div>
+            <div class="text-end">
+                <p><strong>Date Sold:</strong> {{ sale.date_sold|date:"Y-m-d H:i" }}</p>
+            </div>
+        </div>
+        <hr>
+    
+        <p class="text-center"><strong>Invoice Details</strong></p>
+
+        <table class="table table-bordered mt-4">
+            <thead class="table-light">
+                <tr>
+                    <th></th>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price at Sale</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.quantity_sold }}</td>
+                        <td>${{ item.price_at_sale }}</td>
+                        <td>${{ item.price_at_sale|multiply:item.quantity_sold|floatformat:2 }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr class="table-primary">
+                    <th colspan="4" class="text-end"><strong>TOTAL :</strong></th>
+                    <th>${{ sale.total_amount }}</th>
+                </tr>
+            </tfoot>
+        </table>
+        <!-- Footer -->
+        <div class="text-center mt-4">
+            <p>
+                Thank you for shopping with <strong>B_Shop Cosmetics!</strong> | 
+                <small>Invoice generated on <span style="font-weight: bold; font-style: italic;">{{ sale.date_sold|date:"Y-m-d H:i" }}</span></small>
+            </p>
+        </div>
+    </div>
+
+  
+    <div class="d-flex justify-content-end gap-2 mt-3">
+        <a href="{% url 'salesRepDashboard' %}" class="btn btn-secondary mt-3" style="width: 100px;"><i class="bi bi-arrow-return-left"> Back </i></a> 
+        <a href="#" onclick="printInvoice()" class="btn btn-info mt-3" style="width: 100px;"><i class="bi bi-printer"> Print </i></a> 
+    </div>
+
+    <!-- Print Invoice Function -->
+    <script>
+        function printInvoice() {
+            var printContents = document.getElementById('invoiceArea').innerHTML;
+            var originalContents = document.body.innerHTML;
+
+            document.body.innerHTML = printContents;
+            window.print();
+            document.body.innerHTML = originalContents;
+            location.reload();  // reload page to restore functionality
+        }
+    </script>
+{% endblock %}
+
+
+
+
+
 
 <h2>Sales Invoice</h2>
 

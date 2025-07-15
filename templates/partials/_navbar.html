@@ -14,43 +14,59 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav m-auto mb-2 mb-lg-0"> <!-- m-auto for centering ul links -->
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">Dashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Products</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Brands</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Stock</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Sales</a>
-                </li>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0"> <!-- m-auto for centering ul links -->
+                {% if user.is_authenticated %}
+                    {% if user.user_type == 1 %}
+                        <!-- SystemAdmin links -->
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="{% url 'admindashboard' %}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'list_product' %}">Products</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'brand_list' %}">Brands</a>
+                        </li>
+                    {% elif user.user_type == 2 %}
+                        <!-- SalesReps links -->
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="{% url 'salesRepDashboard' %}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'receive_stock' %}">Stock</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'make_sale' %}">Sales</a>
+                        </li>
+                    {% endif %}
+                {% endif %}
             </ul>
             <!-- User Profile Start -->
             <ul class="navbar-nav mb-2 mb-lg-0">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-person-circle" style="font-size: 26px;"></i>
-                        <span class="text-info ms-2">{{ user.username }}</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="#">Profile</a></li>
-                        <li><a class="dropdown-item" href="#">Change Password</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form action="{% url 'userLogout' %}" method="post">
-                                {% csrf_token %}
-                                <input type="submit" class="dropdown-item" value="Logout">
-                            </form>
-                            <!--a class="dropdown-item" href="#">Logout</a-->
-                        </li>
-                    </ul>
-                </li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle" style="font-size: 26px;"></i>
+                            <span class="text-info ms-2">{{ user.username }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li><a class="dropdown-item" href="#">Change Password</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{% url 'userLogout' %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="submit" class="dropdown-item" value="Logout">
+                                </form>
+                                <!--a class="dropdown-item" href="#">Logout</a-->
+                            </li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'userLogin' %}">Login</a>
+                    </li>
+                {% endif %}
             </ul>
             <!-- User Profile Ends -->
         </div>

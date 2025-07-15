@@ -1,0 +1,90 @@
+{% extends 'partials/base.html' %}
+
+{% block title %}Receipt #{{ sale.id }}{% endblock %}
+
+{% block content %}
+{% load shop_extras %}
+
+<div class="container my-3" id="invoiceArea" style="max-width: 400px;">
+
+    <!-- Shop Header -->
+    <div class="text-center mb-3">
+        <h4 class="text-info mb-0"><i class="bi bi-gem"></i> B_Shop Cosmetics</h4>
+        <small>123 Beauty Street, Harare</small><br>
+        <small>+263 77 123 4567</small>
+        <hr>
+    </div>
+
+    <!-- Invoice Details -->
+    <div class="mb-2">
+        <small><strong>Receipt No:</strong> {{ sale.id }}</small><br>
+        <small><strong>Sold By:</strong> {{ sale.sold_by.username|default:"N/A" }}</small><br>
+        <small><strong>Date:</strong> {{ sale.date_sold|date:"Y-m-d H:i" }}</small>
+    </div>
+
+    <!-- Items Table -->
+    <table class="table table-sm table-borderless">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th class="text-end">Qty</th>
+                <th class="text-end">Amt</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td class="text-end">{{ item.quantity_sold }}</td>
+                <td class="text-end">${{ item.price_at_sale|multiply:item.quantity_sold|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <hr class="my-2">
+
+    <!-- Total -->
+    <div class="d-flex justify-content-between">
+        <strong>Total</strong>
+        <strong>${{ sale.total_amount }}</strong>
+    </div>
+
+    <hr class="my-2">
+
+    <!-- Footer -->
+    <div class="text-center mt-2">
+        <small>Thank you for shopping!</small><br>
+        <small>Visit us again.</small>
+    </div>
+
+</div>
+
+<!-- Action Buttons -->
+<div class="container d-flex justify-content-end gap-2 mt-3" style="max-width: 400px;">
+    <a href="{% url 'salesRepDashboard' %}" class="btn btn-secondary btn-sm" style="width: 90px;">
+        <i class="bi bi-arrow-return-left"></i> Back
+    </a>
+    <a href="#" onclick="printInvoice()" class="btn btn-info btn-sm" style="width: 90px;">
+        <i class="bi bi-printer"></i> Print
+    </a>
+</div>
+
+<!-- Print Script (popup window) -->
+<script>
+function printInvoice() {
+    var invoiceContent = document.getElementById('invoiceArea').innerHTML;
+    var printWindow = window.open('', '', 'height=600,width=400');
+    printWindow.document.write('<html><head><title>Print Receipt</title>');
+    printWindow.document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">');
+    printWindow.document.write('</head><body>');
+    printWindow.document.write(invoiceContent);
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+}
+</script>
+
+{% endblock %}
