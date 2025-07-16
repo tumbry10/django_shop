@@ -17,10 +17,10 @@ class StockInItemForm(forms.Form):
     product = forms.ModelChoiceField(queryset=Product.objects.all(), label='Product')
     quantity_received = forms.IntegerField(min_value=1, label='Quantity Received')
 
-StockInItemFormSet = formset_factory(StockInItemForm, extra=5)  # 5 rows by default
+StockInItemFormSet = formset_factory(StockInItemForm, extra=1)  # start with 1 item in the formset
 
 class SaleItemForm(forms.Form):
     product = forms.ModelChoiceField(queryset=Product.objects.all(), label='Product')
     quantity_sold = forms.IntegerField(min_value=1, label='Quantity Sold')
 
-SaleItemFormSet = formset_factory(SaleItemForm, extra=5)  # 5 rows by default
+SaleItemFormSet = formset_factory(SaleItemForm, extra=1)  # start with 1 item in the formset

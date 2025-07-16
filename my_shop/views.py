@@ -270,8 +270,10 @@ def makeSale(request):
             messages.error(request, 'Invalid Form Data')
     else:
         formset = SaleItemFormSet()
+    products = Product.objects.all()
     context = {
         'formset': formset,
+        'products': products,
     }
     return render(request, 'my_shop/salesRep/makeSale.html', context)
 

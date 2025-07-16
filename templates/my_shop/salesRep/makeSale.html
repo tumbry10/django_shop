@@ -15,52 +15,153 @@
             </div>
         {% endif %}
 
-        <form method="POST">
+        <form method="POST" id="sale-form">
             {% csrf_token %}
-            {{ formset.management_form }}
+            <div id="formset-area">
+                {{ formset.management_form }}
 
-            {% for form in formset %}       
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        {{ form.product.label_tag }}
-                        {{ form.product|add_class:"form-select" }}
+                {% for form in formset %}
+                    <div class="form-row row mb-3 sale-form-item border p-2 rounded">
+                        <div class="col-md-4 mt-2">
+                            {{ form.product.label_tag }}
+                            {{ form.product|add_class:"form-select product-select" }}
+                        </div>
+                        <div class="col-md-2 mt-2">
+                            {{ form.quantity_sold.label_tag }}
+                            {{ form.quantity_sold|add_class:"form-control quantity-input" }}
+                        </div>
+                        <div class="col-md-2 mt-2">
+                            <label>Unit Price:</label>
+                            <input type="text" class="form-control unit-price" readonly>
+                        </div>
+                        <div class="col-md-2 mt-2">
+                            <label>Line Total</label>
+                            <input type="text" class="form-control line-total" readonly>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end mt-2">
+                            <button type="button" class="btn btn-warning remove-form btn-sm">
+                                <i class="bi bi-x-lg"></i> Remove
+                            </button>
+                        </div>
                     </div>
-                    <div class="col-md-4">
-                        {{ form.quantity_sold.label_tag }}
-                        {{ form.quantity_sold|add_class:"form-control" }}
-                    </div>
+                {% endfor %}
+
+            </div>
+            <div class="d-grid d-md-flex justify-content-md-end">
+                <button type="button" class="btn btn-info btn-sm rounded-pill" id="add-item">
+                    <i class="bi bi-plus"></i>Add Product
+                </button>
+            </div>
+            <div class="row justify-content-end mt-4">
+                <div class="col-md-2 text-end d-flex align-items-center justify-content-end">
+                    <label for="grand-total" class="me-2 fw-bold mb-0">Grand_Total : $</label>
                 </div>
-            {% endfor %}
-            <button type="submit" class="form-control btn btn-outline-success rounded-pill">Complete Sale</button>
+                <div class="col-md-2">
+                    <input type="text" id="grand-total" class="form-control fw-bold" readonly>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-outline-success rounded-pill form-control mt-4">Complete Sale</button>
         </form>
     </div>
+
+    <script>
+        const productPrices = {
+            {% for product in products %}
+            "{{ product.id }}": "{{ product.price }}",
+            {% endfor %}
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const formsetArea = document.getElementById('formset-area');
+            const addBtn = document.getElementById('add-item');
+            const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+            let formIndex = parseInt(totalForms.value);
+
+            function updateLineTotal(row) {
+                const price = parseFloat(row.querySelector('.unit-price').value) || 0;
+                const quantity = parseInt(row.querySelector('.quantity-input').value) || 0;
+                row.querySelector('.line-total').value = (price * quantity).toFixed(2);
+                updateGrandTotal();
+            }
+
+
+            function attachHandlers(row) {
+                const productSelect = row.querySelector('.product-select');
+                const quantityInput = row.querySelector('.quantity-input');
+                const priceInput = row.querySelector('.unit-price');
+                const totalInput = row.querySelector('.line-total');
+
+                productSelect.addEventListener('change', () => {
+                    const price = productPrices[productSelect.value] || 0;
+                    priceInput.value = price;
+                    updateLineTotal(row);
+                });
+
+                quantityInput.addEventListener('input', () => {
+                    updateLineTotal(row);
+                });
+            }
+
+            function attachRemoveButtons() {
+                document.querySelectorAll('.remove-form').forEach(btn => {
+                    btn.removeEventListener('click', handleRemove);
+                    btn.addEventListener('click', handleRemove);
+                });
+            }
+
+            function handleRemove(event) {
+                const rows = document.querySelectorAll('.sale-form-item');
+                if (rows.length > 1) {
+                    event.target.closest('.sale-form-item').remove();
+                    formIndex--;
+                    totalForms.value = formIndex;
+                } else {
+                    alert("At least one item must remain.");
+                }
+            }
+            updateGrandTotal();
+
+            function init() {
+                document.querySelectorAll('.sale-form-item').forEach(row => {
+                    row.querySelector('.quantity-input').value = 1;  // default qty = 1
+                    attachHandlers(row);
+                });
+                attachRemoveButtons();
+            }
+
+            // Update Grand Total function
+            function updateGrandTotal() {
+                let grandTotal = 0;
+                document.querySelectorAll('.sale-form-item').forEach(row => {
+                    const lineTotal = parseFloat(row.querySelector('.line-total').value) || 0;
+                    grandTotal += lineTotal;
+                });
+                document.getElementById('grand-total').value = grandTotal.toFixed(2);
+            }
+
+
+            addBtn.addEventListener('click', function () {
+                const original = document.querySelector('.sale-form-item');
+                const clone = original.cloneNode(true);
+                const formRegex = RegExp(`form-(\\d){1,}-`, 'g');
+
+                clone.innerHTML = clone.innerHTML.replace(formRegex, `form-${formIndex}-`);
+                clone.querySelectorAll('select, input').forEach(el => {
+                    if (el.classList.contains('quantity-input')) el.value = 1;
+                    else el.value = '';
+                });
+
+                formsetArea.appendChild(clone);
+                totalForms.value = ++formIndex;
+
+                attachHandlers(clone);
+                attachRemoveButtons();
+            });
+
+            init();
+        });
+    </script>
+
+
+
 {% endblock %}
-
-
-
-
-<h1>Hello, Receive New Stock here</h1>
-
-<form action="" method="post">
-    {% csrf_token %}
-    {{ formset.management_form }}
-    {% for form in formset %}
-        <div style="margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 10px;">
-            {{ form.as_p }}
-        </div>
-    {% endfor %}
-    
-    {% if form.errors %}
-        <ul class="errorlist">
-            {% for field in form %}
-                {% for error in field.errors %}
-                    <li>{{ field.label }}: {{ error }}</li>
-                {% endfor %}
-            {% endfor %}
-            {% for error in form.non_field_errors %}
-                <li>{{ error }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-    <input type="submit" value="Finalize Sale" class="btn btn-primary">
-</form>
