@@ -177,33 +177,37 @@ def deleteProduct(request, pk):
 @login_required
 @sales_rep_required
 def receiveStock(request):
-    formset = StockInItemFormSet()
     if request.method == 'POST':
-        formset = StockInItemFormSet(request.POST, request.FILES)
+        formset = StockInItemFormSet(request.POST)
 
         if formset.is_valid():
-            #Create one stockIn record
-            stockIn = StockIn.objects.create(received_by = request.user)
+            # Create StockIn record (auto date, sets received_by)
+            stockIn = StockIn.objects.create(received_by=request.user)
 
             for form in formset:
-                if form.cleaned_data:
+                if form.cleaned_data and form.cleaned_data.get('product') and form.cleaned_data.get('quantity_received'):
                     product = form.cleaned_data['product']
                     quantity_received = form.cleaned_data['quantity_received']
 
-                    #create stockInItem record
+                    # Create StockInItem
                     StockInItem.objects.create(
-                        stock_in=stockIn, 
-                        product=product, 
+                        stock_in=stockIn,
+                        product=product,
                         quantity_received=quantity_received
                     )
 
-                    #Update product quantity
+                    # Update product quantity
                     product.quantity_in_stock += quantity_received
                     product.save()
-        messages.success(request, 'Stock Received Successfully')
-        return redirect('salesRepDashboard')
+
+            messages.success(request, 'Stock Received Successfully')
+            return redirect('salesRepDashboard')
+        else:
+            # This runs when formset.is_valid() is False
+            messages.error(request, 'Please correct the errors below.')
     else:
         formset = StockInItemFormSet()
+    
     context = {
         'formset': formset,
     }
