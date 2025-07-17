@@ -191,6 +191,7 @@ def editProduct(request, pk):
         form = ProductCreationForm(instance=product)
     context = {
         'form': form,
+        'product': product,
     }
     return render(request, 'my_shop/systmAdmin/editProduct.html', context)
 
