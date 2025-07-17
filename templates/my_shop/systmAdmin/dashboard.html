@@ -1,39 +1,244 @@
-Hello, Systm Admin
 
-<div>
-    {% if messages %}
-        <div>
-            {% for message in messages %}
-                <p>{{ message }}</p>
-            {% endfor %}
+{% extends 'partials/base.html' %}
+
+{% block title %}Systm Admin Dashboard{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Admin Dashboard</h1>
+
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Products</h5>
+                    <p class="card-text display-6">{{ total_products }}</p>
+                </div>
+            </div>
         </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Product Brands</h5>
+                    <p class="card-text display-6">{{ total_brands }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Stock Ins</h5>
+                    <p class="card-text display-6">{{ total_stock_in }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+          <div class="card text-white bg-secondary">
+            <div class="card-body">
+                <h5 class="card-title">Total Sales</h5>
+                <p class="card-text display-6">{{ total_sales }}</p>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+          <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">No Of Sales Reps</h5>
+                <p class="card-text display-6">{{ total_sales_reps }}</p>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+          <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">No Of Syst Admins</h5>
+                <p class="card-text display-6">{{ total_admins }}</p>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+          <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">Total Users</h5>
+                <p class="card-text display-6">{{ total_users }}</p>
+              </div>
+          </div>
+        </div>
+        
+    </div>
+    
+    {% if messages %}
+      <div class="container mt-2">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      </div>
     {% endif %}
-</div>
 
-<a href="{% url 'create_brand' %}">Create Brand</a> | <a href="{% url 'create_product' %}">Create Product</a> <br>
 
-<div>
-    <h3>SYSTEM SUMMARY</h3>
-    <ul>
-        <li>Total Products: {{ total_products }}</li>
-        <li>Total Brands: {{ total_brands }}</li>
-        <li>Total Stock Ins: {{ total_stock_in }}</li>
-        <li>Total Sales: {{ total_sales }}</li>
-        <li>Total Users: {{ total_users }}</li>
-        <li>Total Sales Reps: {{ total_sales_reps }}</li>
-        <li>Total Admins: {{ total_admins }}</li>
-    </ul>
-</div>
-<br>
-<h3>⚠️ Low Stock Products</h3>
-{% if low_stock_products %}
-  <ul>
-    {% for product in low_stock_products %}
-      <li>{{ product.name }} — Only {{ product.quantity_in_stock }} left</li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <p>No low stock products 🎉</p>
-{% endif %}
+    <!--h3 class="mt-5">🛒 Latest Sales</h3>
+    {% if latest_sales %}
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Date Sold</th>
+                    <th>Total Amount</th>
+                    <th>View Invoice</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sale in latest_sales %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ sale.date_sold|date:"Y-m-d H:i" }}</td>
+                    <td>${{ sale.total_amount }}</td>
+                    <td>
+                      <a href="{% url 'sale_invoice' sale.pk %}"><i class="bi bi-file-earmark-text"></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No sales yet.</p>
+    {% endif %}
 
-<a href="{% url 'userLogout' %}">Logout</a>
+    <h3 class="mt-5">⚠️ Low Stock Products</h3>
+    {% if low_stock_products %}
+      <ul class="list-group">
+        {% for product in low_stock_products %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ product.name }}
+            <span class="badge bg-danger rounded-pill">{{ product.quantity_in_stock }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No low stock products 🎉</p>
+    {% endif %}-->
+
+  <h3>Top 5 Most Sold Products</h3>
+  <table class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Product</th>
+        <th>Brand</th>
+        <th>Quantity Sold</th>
+        <th>Total Revenue ($)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for product in top_products %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ product.product__name }}</td>
+        <td>{{ product.product__brand__name }}</td>
+        <td>{{ product.total_quantity_sold }}</td>
+        <td>${{ product.total_revenue|floatformat:2 }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5">No sales yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <div class="container mt-4">
+    <div class="row">
+      <!-- Bar Chart Column -->
+      <div class="col-md-6">
+        <h5 class="text-center">Top 5 Most Sold Products</h5>
+        <canvas id="salesBarChart" style="width: 100%; height: 300px;"></canvas>
+      </div>
+
+      <!-- Pie Chart Column -->
+      <div class="col-md-6">
+        <h5 class="text-center mb-3">Revenue Distribution</h5>
+        <div class="mt-4" style="width: 100%; max-width: 300px; margin: auto;">
+          <canvas id="revenuePieChart" style="width: 100%; height: 300px;"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    // BAR CHART 
+    const labels = {{ chart_labels|safe }};
+    const data = {{ chart_data|safe }};
+
+    const ctx = document.getElementById('salesBarChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Quantity Sold',
+                data: data,
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+
+    // PIE CHART
+    const revenueData = {{ revenue_data|safe }};
+    const revenueLabels = {{ chart_labels|safe }};
+
+    const pieCtx = document.getElementById('revenuePieChart').getContext('2d');
+    new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: revenueLabels,
+            datasets: [{
+                label: 'Revenue (USD)',
+                data: revenueData,
+                backgroundColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56',
+                    '#4BC0C0',
+                    '#9966FF'
+                ],
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+  </script>
+  <!-- END PIE CHART -->
+{% endblock %}

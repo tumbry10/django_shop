@@ -5,7 +5,9 @@ from django.contrib import messages
 from . models import Brand, Product, StockIn, StockInItem, Sale, SaleItem
 from . forms import BrandCreationForm, ProductCreationForm, StockInItemFormSet, SaleItemFormSet
 from accounts.models import CustomUser
-from django.db.models import F
+from django.db.models import Sum, F, FloatField, ExpressionWrapper
+import json
+from django.core.serializers.json import DjangoJSONEncoder
 
 # Create your views here.
 @login_required
@@ -25,6 +27,28 @@ def AdminDashboard(request):
     low_stock_products = Product.objects.filter(quantity_in_stock__lte=F('low_stock_threshold')).order_by('quantity_in_stock')
 
 
+    # Top 5 most sold products, Calculate total sold & total revenue per product
+    top_products = (
+        SaleItem.objects
+        .values('product', 'product__name', 'product__brand__name')
+        .annotate(
+            total_quantity_sold=Sum('quantity_sold'),
+            total_revenue=Sum(
+                ExpressionWrapper(
+                    F('quantity_sold') * F('price_at_sale'),
+                    output_field=FloatField()
+                )
+            )
+        )
+        .order_by('-total_quantity_sold')[:5]
+    )
+
+    labels = [f"{p['product__name']} ({p['product__brand__name']})" for p in top_products]
+    quantities = [p['total_quantity_sold'] for p in top_products]
+
+    revenues = [float(p['total_revenue']) for p in top_products]  # Convert Decimal to float
+
+
     context = {
         'brands': brands,
         'products': products,
@@ -35,7 +59,11 @@ def AdminDashboard(request):
         'total_sales_reps': total_sales_reps,
         'total_admins': total_admins,
         'total_users': total_users,
-        'low_stock_products': low_stock_products
+        'low_stock_products': low_stock_products,
+        'top_products': top_products,
+        'chart_labels': json.dumps(labels, cls=DjangoJSONEncoder),
+        'chart_data': json.dumps(quantities, cls=DjangoJSONEncoder),
+        'revenue_data': json.dumps(revenues, cls=DjangoJSONEncoder),
     }
     return render(request, 'my_shop/systmAdmin/dashboard.html', context)
 
